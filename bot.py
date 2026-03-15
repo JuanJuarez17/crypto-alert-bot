@@ -12,10 +12,10 @@ TWILIO_TO          = os.environ.get("TWILIO_TO")     # whatsapp:+54XXXXXXXXXX
 
 # ── Niveles de alerta ─────────────────────────────────────────────
 ALERTAS = {
-    "BNBUSDT": {
-        "take_profit": 665.0,
-        "stop_loss":   641.0,
-        "entrada":     653.73,
+    "SOLUSDT": {
+        "take_profit": 91.87,
+        "stop_loss":   84.00,
+        "entrada":     87.95,
     },
     "BTCUSDT": {
         "take_profit": 72500.0,
@@ -53,7 +53,8 @@ def verificar_alertas():
         try:
             precio = get_price(symbol)
             nombre = symbol.replace("USDT", "")
-            monto  = 19.61 if nombre == "BNB" else 5.65
+            montos = {"SOL": 29.99, "BTC": 5.65}
+            monto  = montos.get(nombre, 0)
             pnl, pct = calcular_pnl(precio, niveles["entrada"], monto)
             print(f"[{nombre}] Precio: ${precio:,.2f} | P&L: ${pnl:+.2f} ({pct:+.1f}%)")
 
@@ -103,7 +104,7 @@ def main():
     send_whatsapp(
         "🤖 *Bot de alertas activado*\n\n"
         "Monitoreando:\n"
-        f"• BNB | TP: $665 | SL: $641\n"
+        f"• SOL | TP: $91.87 | SL: $84.00\n"
         f"• BTC | TP: $72,500 | SL: $69,000\n\n"
         "Te avisaré cuando se alcance algún nivel. 🚀"
     )
