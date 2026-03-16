@@ -13,22 +13,22 @@ TWILIO_TO          = os.environ.get("TWILIO_TO")
 # ── Niveles de alerta ─────────────────────────────────────────────
 ALERTAS = {
     "SOLUSDT": {
-        "take_profit": 95.50,
-        "stop_loss":   87.90,
-        "entrada":     91.92,
-        "monto":       34.9296,
+        "take_profit": 99.77,
+        "stop_loss":   91.70,
+        "entrada":     95.93,
+        "monto":       34.9285,
+    },
+    "BTCUSDT": {
+        "take_profit": 77600.0,
+        "stop_loss":   71400.0,
+        "entrada":     74649.24,
+        "monto":       24.6342,
     },
     "XRPUSDT": {
-        "take_profit": 1.51,
-        "stop_loss":   1.37,
-        "entrada":     1.4484,
-        "monto":       24.9125,
-    },
-    "ETHUSDT": {
-        "take_profit": 2273.0,
-        "stop_loss":   2086.0,
-        "entrada":     2181.47,
-        "monto":       9.8166,
+        "take_profit": 1.622,
+        "stop_loss":   1.476,
+        "entrada":     1.5469,
+        "monto":       9.9002,
     },
 }
 
@@ -108,11 +108,12 @@ def verificar_alertas():
 def main():
     print("🤖 Bot de alertas cripto iniciado...")
     send_whatsapp(
-        "🤖 *Bot de alertas activado — Ronda 2*\n\n"
+        "🤖 *Bot de alertas activado — Ronda 3*\n\n"
         "Monitoreando:\n"
-        f"• SOL | Entrada: $91.92 | TP: $95.50 | SL: $87.90\n"
-        f"• XRP | Entrada: $1.4484 | TP: $1.51 | SL: $1.37\n"
-        f"• ETH | Entrada: $2,181.47 | TP: $2,273 | SL: $2,086\n\n"
+        f"• SOL | Entrada: $95.93 | TP: $99.77 | SL: $91.70\n"
+        f"• BTC | Entrada: $74,649 | TP: $77,600 | SL: $71,400\n"
+        f"• XRP | Entrada: $1.5469 | TP: $1.622 | SL: $1.476\n\n"
+        "⚠️ Recordá cerrar todo el miércoles 19/03 antes de las 16:00 ARG.\n"
         "Te avisaré cuando se alcance algún nivel. 🚀"
     )
     while True:
