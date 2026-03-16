@@ -7,20 +7,28 @@ from twilio.rest import Client
 BINANCE_API_KEY    = os.environ.get("BINANCE_API_KEY")
 TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN  = os.environ.get("TWILIO_AUTH_TOKEN")
-TWILIO_FROM        = os.environ.get("TWILIO_FROM")   # whatsapp:+14155238886
-TWILIO_TO          = os.environ.get("TWILIO_TO")     # whatsapp:+54XXXXXXXXXX
+TWILIO_FROM        = os.environ.get("TWILIO_FROM")
+TWILIO_TO          = os.environ.get("TWILIO_TO")
 
 # ── Niveles de alerta ─────────────────────────────────────────────
 ALERTAS = {
     "SOLUSDT": {
-        "take_profit": 91.87,
-        "stop_loss":   84.00,
-        "entrada":     87.95,
+        "take_profit": 95.50,
+        "stop_loss":   87.90,
+        "entrada":     91.92,
+        "monto":       34.9296,
     },
-    "BTCUSDT": {
-        "take_profit": 72500.0,
-        "stop_loss":   69000.0,
-        "entrada":     70590.02,
+    "XRPUSDT": {
+        "take_profit": 1.51,
+        "stop_loss":   1.37,
+        "entrada":     1.4484,
+        "monto":       24.9125,
+    },
+    "ETHUSDT": {
+        "take_profit": 2273.0,
+        "stop_loss":   2086.0,
+        "entrada":     2181.47,
+        "monto":       9.8166,
     },
 }
 
@@ -53,17 +61,15 @@ def verificar_alertas():
         try:
             precio = get_price(symbol)
             nombre = symbol.replace("USDT", "")
-            montos = {"SOL": 29.99, "BTC": 5.65}
-            monto  = montos.get(nombre, 0)
-            pnl, pct = calcular_pnl(precio, niveles["entrada"], monto)
-            print(f"[{nombre}] Precio: ${precio:,.2f} | P&L: ${pnl:+.2f} ({pct:+.1f}%)")
+            pnl, pct = calcular_pnl(precio, niveles["entrada"], niveles["monto"])
+            print(f"[{nombre}] Precio: ${precio:,.4f} | P&L: ${pnl:+.2f} ({pct:+.1f}%)")
 
             # ── Take Profit ──
             if precio >= niveles["take_profit"] and "tp" not in alertas_enviadas[symbol]:
                 msg = (
                     f"🟢 *{nombre} — TAKE PROFIT ALCANZADO*\n"
-                    f"Precio actual: ${precio:,.2f}\n"
-                    f"Target: ${niveles['take_profit']:,.2f}\n"
+                    f"Precio actual: ${precio:,.4f}\n"
+                    f"Target: ${niveles['take_profit']:,.4f}\n"
                     f"P&L estimado: ${pnl:+.2f} ({pct:+.1f}%)\n\n"
                     f"✅ La orden OCO debería haberse ejecutado.\n"
                     f"Verificá en Binance y cerrá si no se ejecutó."
@@ -75,8 +81,8 @@ def verificar_alertas():
             elif precio <= niveles["stop_loss"] and "sl" not in alertas_enviadas[symbol]:
                 msg = (
                     f"🔴 *{nombre} — STOP LOSS ALCANZADO*\n"
-                    f"Precio actual: ${precio:,.2f}\n"
-                    f"Stop: ${niveles['stop_loss']:,.2f}\n"
+                    f"Precio actual: ${precio:,.4f}\n"
+                    f"Stop: ${niveles['stop_loss']:,.4f}\n"
                     f"P&L estimado: ${pnl:+.2f} ({pct:+.1f}%)\n\n"
                     f"⚠️ La orden OCO debería haberse ejecutado.\n"
                     f"Verificá en Binance y cerrá si no se ejecutó."
@@ -88,9 +94,9 @@ def verificar_alertas():
             elif precio <= (niveles["stop_loss"] * 1.01) and "sl_warning" not in alertas_enviadas[symbol]:
                 msg = (
                     f"⚠️ *{nombre} — CERCA DEL STOP LOSS*\n"
-                    f"Precio actual: ${precio:,.2f}\n"
-                    f"Stop Loss en: ${niveles['stop_loss']:,.2f}\n"
-                    f"Diferencia: ${precio - niveles['stop_loss']:,.2f}\n\n"
+                    f"Precio actual: ${precio:,.4f}\n"
+                    f"Stop Loss en: ${niveles['stop_loss']:,.4f}\n"
+                    f"Diferencia: ${precio - niveles['stop_loss']:,.4f}\n\n"
                     f"Mantené la calma, la OCO está activa."
                 )
                 send_whatsapp(msg)
@@ -102,15 +108,16 @@ def verificar_alertas():
 def main():
     print("🤖 Bot de alertas cripto iniciado...")
     send_whatsapp(
-        "🤖 *Bot de alertas activado*\n\n"
+        "🤖 *Bot de alertas activado — Ronda 2*\n\n"
         "Monitoreando:\n"
-        f"• SOL | TP: $91.87 | SL: $84.00\n"
-        f"• BTC | TP: $72,500 | SL: $69,000\n\n"
+        f"• SOL | Entrada: $91.92 | TP: $95.50 | SL: $87.90\n"
+        f"• XRP | Entrada: $1.4484 | TP: $1.51 | SL: $1.37\n"
+        f"• ETH | Entrada: $2,181.47 | TP: $2,273 | SL: $2,086\n\n"
         "Te avisaré cuando se alcance algún nivel. 🚀"
     )
     while True:
         verificar_alertas()
-        time.sleep(60)  # Chequea cada 60 segundos
+        time.sleep(60)
 
 if __name__ == "__main__":
     main()
