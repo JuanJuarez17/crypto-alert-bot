@@ -13,16 +13,16 @@ TWILIO_TO          = os.environ.get("TWILIO_TO")
 # ── Niveles de alerta ─────────────────────────────────────────────
 ALERTAS = {
     "BTCUSDT": {
-        "take_profit": 72346.0,
-        "stop_loss":   67800.0,
-        "entrada":     70044.61,
-        "monto":       29.4187,
+        "take_profit": 78338.0,
+        "stop_loss":   61900.0,
+        "entrada":     68120.10,
+        "monto":       44.9593,
     },
-    "SOLUSDT": {
-        "take_profit": 92.40,
-        "stop_loss":   86.00,
-        "entrada":     89.04,
-        "monto":       19.9450,
+    "XRPUSDT": {
+        "take_profit": 1.665,
+        "stop_loss":   1.251,
+        "entrada":     1.3884,
+        "monto":       24.9912,
     },
 }
 
@@ -84,17 +84,41 @@ def verificar_alertas():
                 send_whatsapp(msg)
                 alertas_enviadas[symbol].add("sl")
 
-            # ── Alerta previa: 1% antes del stop ──
-            elif precio <= (niveles["stop_loss"] * 1.01) and "sl_warning" not in alertas_enviadas[symbol]:
+            # ── Alerta previa: 5% antes del stop (mediano plazo) ──
+            elif precio <= (niveles["stop_loss"] * 1.05) and "sl_warning" not in alertas_enviadas[symbol]:
                 msg = (
                     f"⚠️ *{nombre} — CERCA DEL STOP LOSS*\n"
                     f"Precio actual: ${precio:,.4f}\n"
                     f"Stop Loss en: ${niveles['stop_loss']:,.4f}\n"
                     f"Diferencia: ${precio - niveles['stop_loss']:,.4f}\n\n"
+                    f"Recordá: esta es una estrategia de mediano plazo.\n"
                     f"Mantené la calma, la OCO está activa."
                 )
                 send_whatsapp(msg)
                 alertas_enviadas[symbol].add("sl_warning")
+
+            # ── Alerta de progreso: cada 5% de avance hacia el TP ──
+            elif pct >= 5.0 and "progress_5" not in alertas_enviadas[symbol]:
+                msg = (
+                    f"📈 *{nombre} — PROGRESO +5%*\n"
+                    f"Precio actual: ${precio:,.4f}\n"
+                    f"P&L estimado: ${pnl:+.2f} ({pct:+.1f}%)\n"
+                    f"Take Profit en: ${niveles['take_profit']:,.4f}\n\n"
+                    f"Vas bien, mantené la posición. 💪"
+                )
+                send_whatsapp(msg)
+                alertas_enviadas[symbol].add("progress_5")
+
+            elif pct >= 10.0 and "progress_10" not in alertas_enviadas[symbol]:
+                msg = (
+                    f"🚀 *{nombre} — PROGRESO +10%*\n"
+                    f"Precio actual: ${precio:,.4f}\n"
+                    f"P&L estimado: ${pnl:+.2f} ({pct:+.1f}%)\n"
+                    f"Take Profit en: ${niveles['take_profit']:,.4f}\n\n"
+                    f"Excelente, casi llegás al objetivo! 🎯"
+                )
+                send_whatsapp(msg)
+                alertas_enviadas[symbol].add("progress_10")
 
         except Exception as e:
             print(f"[ERROR {symbol}] {e}")
@@ -102,11 +126,16 @@ def verificar_alertas():
 def main():
     print("🤖 Bot de alertas cripto iniciado...")
     send_whatsapp(
-        "🤖 *Bot de alertas activado — Ronda 4*\n\n"
+        "🤖 *Bot de alertas activado — Mediano Plazo*\n\n"
         "Monitoreando:\n"
-        f"• BTC | Entrada: $70,044 | TP: $72,346 | SL: $67,800\n"
-        f"• SOL | Entrada: $89.04 | TP: $92.40 | SL: $86.00\n\n"
-        "Te avisaré cuando se alcance algún nivel. 🚀"
+        f"• BTC | Entrada: $68,120 | TP: $78,338 (+15%) | SL: $61,900 (-9.1%)\n"
+        f"• XRP | Entrada: $1.3884 | TP: $1.665 (+19.9%) | SL: $1.251 (-9.9%)\n\n"
+        "Alertas configuradas:\n"
+        "📈 Progreso a +5% y +10%\n"
+        "⚠️ Aviso cuando falte 5% para el stop\n"
+        "🟢 Take Profit alcanzado\n"
+        "🔴 Stop Loss alcanzado\n\n"
+        "Plazo estimado: 3 a 5 semanas. 💪"
     )
     while True:
         verificar_alertas()
